@@ -19,7 +19,7 @@ class SynapseStatusStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         function = _lambda.Function(
             self, "StatusUpdaterFunction",
-            runtime=_lambda.Runtime.NODEJS_18_X,
+            runtime=_lambda.Runtime.NODEJS_22_X,
             handler="statuspage_updater.handler",
             code=_lambda.Code.from_asset(str(Path(__file__).parent.parent / "lambda")),
             environment={
