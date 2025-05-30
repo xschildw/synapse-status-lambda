@@ -20,7 +20,7 @@ class SynapseStatusStack(Stack):
         function = _lambda.Function(
             self, "StatusUpdaterFunction",
             runtime=_lambda.Runtime.NODEJS_18_X,
-            handler="status_updater.handler",
+            handler="statuspage_updater.handler",
             code=_lambda.Code.from_asset(str(Path(__file__).parent.parent / "lambda")),
             environment={
                 "REPO_STATUS_ENDPOINT": "https://repo-prod.prod.sagebase.org/repo/v1/status",
