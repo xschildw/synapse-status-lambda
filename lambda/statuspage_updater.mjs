@@ -17,7 +17,7 @@ export const handler = async () => {
       websiteStatus.statusMessage
     );
 
-    console.log("Status update completed.");
+    console.log("Status update completed.", );
   } catch (err) {
     console.error("Error in handler:", err);
     throw err;
