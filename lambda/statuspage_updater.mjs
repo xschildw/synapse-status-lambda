@@ -2,22 +2,25 @@ const STATUSPAGE_API_URL = "https://api.statuspage.io/v1/pages";
 
 export const handler = async () => {
   try {
+    console.log("Starting status update...");
     const repoStatus = await getStatus(process.env.REPO_STATUS_ENDPOINT);
     const websiteStatus = await getStatus(process.env.WEBSITE_URL_ENDPOINT);
 
+    console.log("Updating repo status:", repoStatus);
     await updateComponentStatus(
       process.env.STATUS_PAGE_IO_REPO_COMPONENT_ID,
       repoStatus.status === "READ_WRITE" ? "operational" : "under_maintenance",
       repoStatus.currentMessage
     );
 
+    console.log("Updating website status:", websiteStatus);
     await updateComponentStatus(
       process.env.STATUS_PAGE_IO_WEBSITE_COMPONENT_ID,
       websiteStatus.statusCode === 200 ? "operational" : "major_outage",
       websiteStatus.statusMessage
     );
 
-    console.log("Status update completed.", );
+    console.log("Status update completed.");
   } catch (err) {
     console.error("Error in handler:", err);
     throw err;
@@ -29,9 +32,14 @@ async function getStatus(endpoint) {
   const text = await res.text();
 
   try {
-    const json = JSON.parse(text);
-    return { status: json.status, currentMessage: json.currentMessage, statusCode: res.status };
+    if (endpoint == process.env.REPO_STATUS_ENDPOINT) {
+      const json = JSON.parse(text);
+      return { status: json.status, currentMessage: json.currentMessage, statusCode: res.status };
+    } else {
+      return { statusCode: res.status, statusMessage: text };
+    }
   } catch {
+    console.error("Error parsing endpoint response:", text);
     return { statusCode: res.status, statusMessage: text };
   }
 }
@@ -56,5 +64,4 @@ async function updateComponentStatus(componentId, status, message) {
   }
 
   console.log(`Updated component ${componentId} to status: ${status}`);
-  if (message) console.log(`Message: ${message}`);
 }
