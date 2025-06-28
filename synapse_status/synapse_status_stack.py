@@ -4,6 +4,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_events as events,
     aws_events_targets as targets,
+    aws_ec2 as ec2,
 )
 from aws_cdk import aws_signer as signer
 from constructs import Construct
@@ -16,6 +17,7 @@ class SynapseStatusStack(Stack):
                  statuspage_page_id: str,
                  statuspage_repo_component_id: str,
                  statuspage_website_component_id: str,
+                 vpc_id: str,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
@@ -26,6 +28,8 @@ class SynapseStatusStack(Stack):
         signing_config = _lambda.CodeSigningConfig(self, "SigningConfig", signing_profiles=[signing_profile],
             untrusted_artifact_on_deployment=_lambda.UntrustedArtifactOnDeployment.ENFORCE
         )
+
+        vpc = ec2.Vpc.from_lookup(self, "SynapseVPC", vpc_id=vpc_id)
 
         function = _lambda.Function(
             self, "StatusUpdaterFunction",
@@ -41,7 +45,9 @@ class SynapseStatusStack(Stack):
                 "STATUS_PAGE_IO_WEBSITE_COMPONENT_ID": statuspage_website_component_id,
             },
             timeout=Duration.seconds(30),
-            code_signing_config=signing_config
+            code_signing_config=signing_config,
+            vpc=vpc,
+            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS, availability_zones=['us-east-1a', 'us-east-1c'])
         )
 
         # rule = events.Rule(
