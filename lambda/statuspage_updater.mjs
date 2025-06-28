@@ -32,7 +32,7 @@ async function getStatus(endpoint) {
   const text = await res.text();
 
   try {
-    if (endpoint == process.env.REPO_STATUS_ENDPOINT) {
+    if (endpoint === process.env.REPO_STATUS_ENDPOINT) {
       const json = JSON.parse(text);
       return { status: json.status, currentMessage: json.currentMessage, statusCode: res.status };
     } else {

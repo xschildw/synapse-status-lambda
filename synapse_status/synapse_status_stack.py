@@ -5,6 +5,7 @@ from aws_cdk import (
     aws_events as events,
     aws_events_targets as targets,
 )
+from aws_cdk import aws_signer as signer
 from constructs import Construct
 from pathlib import Path
 
@@ -17,6 +18,15 @@ class SynapseStatusStack(Stack):
                  statuspage_website_component_id: str,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        # Create a signing profile
+        signing_profile = signer.SigningProfile(self, "SigningProfile", platform=signer.Platform.AWS_LAMBDA_SHA384_ECDSA )
+
+        # Create a signing config using the profile
+        signing_config = _lambda.CodeSigningConfig(self, "SigningConfig", signing_profiles=[signing_profile],
+            untrusted_artifact_on_deployment=_lambda.UntrustedArtifactOnDeployment.ENFORCE
+        )
+
         function = _lambda.Function(
             self, "StatusUpdaterFunction",
             runtime=_lambda.Runtime.NODEJS_22_X,
@@ -30,6 +40,8 @@ class SynapseStatusStack(Stack):
                 "STATUS_PAGE_IO_REPO_COMPONENT_ID": statuspage_repo_component_id,
                 "STATUS_PAGE_IO_WEBSITE_COMPONENT_ID": statuspage_website_component_id,
             },
+            timeout=Duration.seconds(30),
+            code_signing_config=signing_config
         )
 
         # rule = events.Rule(
