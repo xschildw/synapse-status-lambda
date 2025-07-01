@@ -3,6 +3,7 @@ package-lock.json
 __pycache__
 .pytest_cache
 .venv
+source.bat
 .env
 *.egg-info
 node_modules/

@@ -6,14 +6,14 @@ export const handler = async () => {
     const repoStatus = await getStatus(process.env.REPO_STATUS_ENDPOINT);
     const websiteStatus = await getStatus(process.env.WEBSITE_URL_ENDPOINT);
 
-    console.log("Updating repo status:", repoStatus);
+    console.log("Updating repo status:", repoStatus.statusCode);
     await updateComponentStatus(
       process.env.STATUS_PAGE_IO_REPO_COMPONENT_ID,
       repoStatus.status === "READ_WRITE" ? "operational" : "under_maintenance",
       repoStatus.currentMessage
     );
 
-    console.log("Updating website status:", websiteStatus);
+    console.log("Updating website status:", websiteStatus.statusCode);
     await updateComponentStatus(
       process.env.STATUS_PAGE_IO_WEBSITE_COMPONENT_ID,
       websiteStatus.statusCode === 200 ? "operational" : "major_outage",

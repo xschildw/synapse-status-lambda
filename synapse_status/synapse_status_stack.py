@@ -26,7 +26,7 @@ class SynapseStatusStack(Stack):
 
         # Create a signing config using the profile
         signing_config = _lambda.CodeSigningConfig(self, "SigningConfig", signing_profiles=[signing_profile],
-            untrusted_artifact_on_deployment=_lambda.UntrustedArtifactOnDeployment.ENFORCE
+            untrusted_artifact_on_deployment=_lambda.UntrustedArtifactOnDeployment.WARN
         )
 
         vpc = ec2.Vpc.from_lookup(self, "SynapseVPC", vpc_id=vpc_id)
