@@ -5,6 +5,7 @@ from aws_cdk import (
     aws_events as events,
     aws_events_targets as targets,
     aws_ec2 as ec2,
+    aws_iam as iam
 )
 from constructs import Construct
 from pathlib import Path
@@ -22,6 +23,13 @@ class SynapseStatusStack(Stack):
 
         vpc = ec2.Vpc.from_lookup(self, "SynapseVPC", vpc_id=vpc_id)
 
+        lambda_role = iam.Role(self, "StatusUpdaterExecutionRole",
+                               assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
+                               managed_policies=[
+                                   iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole")
+                               ]
+                               )
+
         function = _lambda.Function(
             self, "StatusUpdaterFunction",
             runtime=_lambda.Runtime.NODEJS_22_X,
@@ -35,6 +43,7 @@ class SynapseStatusStack(Stack):
                 "STATUS_PAGE_IO_REPO_COMPONENT_ID": statuspage_repo_component_id,
                 "STATUS_PAGE_IO_WEBSITE_COMPONENT_ID": statuspage_website_component_id,
             },
+            role=lambda_role,
             timeout=Duration.seconds(30),
             vpc=vpc,
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS, availability_zones=['us-east-1a', 'us-east-1c'])
