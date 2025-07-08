@@ -1,0 +1,55 @@
+name: Deploy synapse-status-lambda
+
+on:
+  workflow_call:
+    inputs:
+      role_to_assume:
+        description: The ARN of the IAM role to assume for deployment
+        required: true
+        type: string
+    
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup AWS CDK
+        run: npm install -g aws-cdk
+
+      - name: Setup Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: config-creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ inputs.role_to_assume }}
+          role-session-name: GitHubActions-${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
+          role-duration-seconds: 1200
+       
+      - name: Deploy CDK Stack
+        env:
+          STATUSPAGE_API_KEY: ${{ secrets.STATUSPAGE_API_KEY }}
+          STATUSPAGE_PAGE_ID: ${{ vars.STATUSPAGE_PAGE_ID }}
+          STATUSPAGE_REPO_COMPONENT_ID: ${{ vars.STATUSPAGE_REPO_COMPONENT_ID }}
+          STATUSPAGE_WEBSITE_COMPONENT_ID: ${{ vars.STATUSPAGE_WEBSITE_COMPONENT_ID }}
+        run: |
+          cdk --region us-east-1 deploy --require-approval never
+
+
