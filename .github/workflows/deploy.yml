@@ -46,6 +46,7 @@ jobs:
        
       - name: Deploy CDK Stack
         env:
+          ACCOUNT_ID: ${{ vars.ACCOUNT_ID }}
           STATUSPAGE_API_KEY: ${{ secrets.STATUSPAGE_API_KEY }}
           STATUSPAGE_PAGE_ID: ${{ vars.STATUSPAGE_PAGE_ID }}
           STATUSPAGE_REPO_COMPONENT_ID: ${{ vars.STATUSPAGE_REPO_COMPONENT_ID }}
