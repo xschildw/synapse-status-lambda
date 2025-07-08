@@ -51,6 +51,6 @@ class SynapseStatusStack(Stack):
 
         rule = events.Rule(
             self, "StatusScheduleRule",
-            schedule=events.Schedule.rate(Duration.minutes(30)),
+            schedule=events.Schedule.rate(Duration.minutes(6)),
         )
         rule.add_target(targets.LambdaFunction(function))
