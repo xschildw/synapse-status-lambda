@@ -10,6 +10,7 @@ concurrency: ci-${{ github.ref }}
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: prod
     permissions:
       id-token: write
 
