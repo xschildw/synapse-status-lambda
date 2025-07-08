@@ -2,8 +2,11 @@ const STATUSPAGE_API_URL = "https://api.statuspage.io/v1/pages";
 
 export const handler = async () => {
   console.log("Starting status update...");
-  await updateRepoStatus();
-  await updateWebsiteStatus();
+  try {
+    await updateRepoStatus();
+  } finally {
+    await updateWebsiteStatus();
+  }
   console.log("Status update completed.");
 };
 
