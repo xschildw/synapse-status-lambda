@@ -50,5 +50,6 @@ jobs:
           STATUSPAGE_REPO_COMPONENT_ID: ${{ vars.STATUSPAGE_REPO_COMPONENT_ID }}
           STATUSPAGE_WEBSITE_COMPONENT_ID: ${{ vars.STATUSPAGE_WEBSITE_COMPONENT_ID }}
         run: |
-          cdk --region us-east-1 deploy
+          cdk --region us-east-1 deploy --require-approval never
+
 
