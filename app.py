@@ -7,7 +7,7 @@ from synapse_status.synapse_status_stack import SynapseStatusStack
 
 def get_required_env(key: str) -> str:
   value = os.environ.get(key)
-  if value is None:
+  if value is None or value == "":
     raise ValueError(f"Missing environment variable: {key}")
   return value
 
